@@ -21,7 +21,7 @@
 #include <f1x/openauto/autoapp/Configuration/IConfiguration.hpp>
 #include <f1x/openauto/autoapp/Service/IService.hpp>
 #include <boost/asio/io_service.hpp>
-#include <f1x/aasdk/Messenger/IMessenger.hpp>
+#include <aasdk/Messenger/IMessenger.hpp>
 
 namespace f1x
 {
