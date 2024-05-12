@@ -49,19 +49,30 @@ bool RtAudioOutput::open()
         parameters.nChannels = channelCount_;
         parameters.firstChannel = 0;
 
+        RtAudio::StreamOptions streamOptions;
+        streamOptions.flags = RTAUDIO_MINIMIZE_LATENCY | RTAUDIO_SCHEDULE_REALTIME;
+        uint32_t bufferFrames = sampleRate_ == 16000 ? 1024 : 2048; //according to the observation of audio packets
+
+    #if RTAUDIO_VERSION_MAJOR >= 6
+        auto error = dac_->openStream(&parameters, nullptr, RTAUDIO_SINT16, sampleRate_, &bufferFrames, &RtAudioOutput::audioBufferReadHandler, static_cast<void*>(this), &streamOptions);
+        if (error != RTAUDIO_NO_ERROR) {
+            OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to open audio output, what: " << dac_->getErrorText();
+            return false;
+        }
+    #else
         try
         {
-            RtAudio::StreamOptions streamOptions;
-            streamOptions.flags = RTAUDIO_MINIMIZE_LATENCY | RTAUDIO_SCHEDULE_REALTIME;
-            uint32_t bufferFrames = sampleRate_ == 16000 ? 1024 : 2048; //according to the observation of audio packets
             dac_->openStream(&parameters, nullptr, RTAUDIO_SINT16, sampleRate_, &bufferFrames, &RtAudioOutput::audioBufferReadHandler, static_cast<void*>(this), &streamOptions);
-            OPENAUTO_LOG(info) << "[RtAudioOutput] Sample Rate: " << sampleRate_;
-            return audioBuffer_.open(QIODevice::ReadWrite);
         }
         catch(const RtAudioError& e)
         {
             OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to open audio output, what: " << e.what();
+            return false;
         }
+    #endif
+
+        OPENAUTO_LOG(info) << "[RtAudioOutput] Sample Rate: " << sampleRate_;
+        return audioBuffer_.open(QIODevice::ReadWrite);
     }
     else
     {
@@ -82,6 +93,13 @@ void RtAudioOutput::start()
 
     if(dac_->isStreamOpen() && !dac_->isStreamRunning())
     {
+    #if RTAUDIO_VERSION_MAJOR >= 6
+        auto error = dac_->startStream();
+        if (error != RTAUDIO_NO_ERROR)
+        {
+            OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to start audio output, what: " << dac_->getErrorText();
+        }
+    #else
         try
         {
             dac_->startStream();
@@ -90,6 +108,7 @@ void RtAudioOutput::start()
         {
             OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to start audio output, what: " << e.what();
         }
+    #endif
     }
 }
 
@@ -129,6 +148,13 @@ void RtAudioOutput::doSuspend()
 {
     if(dac_->isStreamOpen() && dac_->isStreamRunning())
     {
+    #if RTAUDIO_VERSION_MAJOR >= 6
+        auto error = dac_->stopStream();
+        if (error != RTAUDIO_NO_ERROR)
+        {
+            OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to suspend audio output, what: " << dac_->getErrorText();
+        }
+    #else
         try
         {
             dac_->stopStream();
@@ -137,6 +163,7 @@ void RtAudioOutput::doSuspend()
         {
             OPENAUTO_LOG(error) << "[RtAudioOutput] Failed to suspend audio output, what: " << e.what();
         }
+    #endif
     }
 }
 
