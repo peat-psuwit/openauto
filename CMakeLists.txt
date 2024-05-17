@@ -30,7 +30,14 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
 find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Network)
+
+# Newer Protobuf starts requiring Abseil, and the old CMake's FindProtobuf
+# module is not updated to reflect that. Thus, prefer upstream's config module
+# if available.
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 find_package(Protobuf REQUIRED)
+unset(CMAKE_FIND_PACKAGE_PREFER_CONFIG)
+
 find_package(OpenSSL REQUIRED)
 find_package(rtaudio REQUIRED)
 find_package(taglib REQUIRED)
@@ -56,7 +63,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${Qt5Bluetooth_INCLUDE_DIRS}
                     ${Qt5Network_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
-                    ${PROTOBUF_INCLUDE_DIR}
                     ${OPENSSL_INCLUDE_DIR}
                     ${RTAUDIO_INCLUDE_DIRS}
                     ${TAGLIB_INCLUDE_DIRS}
@@ -83,7 +89,7 @@ target_link_libraries(autoapp libusb
                         ${Qt5MultimediaWidgets_LIBRARIES}
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
-                        ${PROTOBUF_LIBRARIES}
+                        protobuf::libprotobuf
                         ${BCM_HOST_LIBRARIES}
                         ${ILCLIENT_LIBRARIES}
                         ${WINSOCK2_LIBRARIES}
@@ -105,5 +111,5 @@ target_link_libraries(btservice
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
                         ${Qt5MultimediaWidgets_LIBRARIES}
-                        ${PROTOBUF_LIBRARIES}
+                        protobuf::libprotobuf
                         ${AASDK_PROTO_LIBRARIES})
