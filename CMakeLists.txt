@@ -41,7 +41,6 @@ unset(CMAKE_FIND_PACKAGE_PREFER_CONFIG)
 find_package(OpenSSL REQUIRED)
 find_package(rtaudio REQUIRED)
 find_package(taglib REQUIRED)
-find_package(blkid REQUIRED)
 find_package(gps REQUIRED)
 
 if(WIN32)
