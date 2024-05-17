@@ -20,6 +20,29 @@
 #include <f1x/openauto/autoapp/Projection/QtVideoOutput.hpp>
 #include <f1x/openauto/Common/Log.hpp>
 
+#ifdef __ANDROID__
+// TODO: have our own VideoOutput that use Gstreamer directly.
+#include <gst/gst.h>
+#include <mutex>
+
+// FIXME: see below
+extern "C" void gst_init_static_plugins ();
+
+static void initGstOnce() {
+    std::once_flag gst_init_once;
+    std::call_once(gst_init_once, []() {
+        gst_init(nullptr, nullptr); // Will automatically register static plugins.
+
+        // FIXME: because dynamic lookup of gst_init_static_plugins() happens inside
+        // whatever .so ships gst_init() (?), it will look up this in MultimediaGstTools
+        // instead of our just-built gstreamer_android.
+        // This is also the reason we have to wrap this in call_once.
+        gst_init_static_plugins();
+    });
+}
+
+#endif
+
 namespace f1x
 {
 namespace openauto
@@ -32,6 +55,10 @@ namespace projection
 QtVideoOutput::QtVideoOutput(configuration::IConfiguration::Pointer configuration)
     : VideoOutput(std::move(configuration))
 {
+#ifdef __ANDROID__
+    initGstOnce();
+#endif
+
     this->moveToThread(QApplication::instance()->thread());
     connect(this, &QtVideoOutput::startPlayback, this, &QtVideoOutput::onStartPlayback, Qt::QueuedConnection);
     connect(this, &QtVideoOutput::stopPlayback, this, &QtVideoOutput::onStopPlayback, Qt::QueuedConnection);

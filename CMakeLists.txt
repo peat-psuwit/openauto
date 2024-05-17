@@ -44,6 +44,9 @@ if(ANDROID)
     find_package(Qt5 REQUIRED COMPONENTS AndroidExtras)
 
     set(ANDROID_PACKAGE_SOURCE_DIR ${base_directory}/android)
+
+    # TODO: will go away when we migrate to qmlglsink
+    find_package(Qt5 REQUIRED COMPONENTS MultimediaGstTools)
 endif()
 
 # Newer Protobuf starts requiring Abseil, and the old CMake's FindProtobuf
@@ -102,6 +105,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${Qt5Bluetooth_INCLUDE_DIRS}
                     ${Qt5Network_INCLUDE_DIRS}
                     ${Qt5AndroidExtras_INCLUDE_DIRS}
+                    ${Qt5MultimediaGstTools_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
                     ${OPENSSL_INCLUDE_DIR}
                     ${RTAUDIO_INCLUDE_DIRS}
@@ -148,6 +152,7 @@ target_link_libraries(autoapp libusb
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
                         ${Qt5AndroidExtras_LIBRARIES}
+                        ${Qt5MultimediaGstTools_LIBRARIES}
                         ${gst_target}
                         protobuf::libprotobuf
                         ${BCM_HOST_LIBRARIES}
