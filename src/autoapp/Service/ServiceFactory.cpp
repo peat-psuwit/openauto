@@ -40,6 +40,7 @@
 #include <f1x/openauto/autoapp/Projection/RemoteBluetoothDevice.hpp>
 #include <f1x/openauto/autoapp/Projection/DummyBluetoothDevice.hpp>
 #include <f1x/openauto/autoapp/Service/WifiService.hpp>
+#include <f1x/openauto/Common/Log.hpp>
 
 namespace f1x
 {
@@ -109,6 +110,10 @@ IService::Pointer ServiceFactory::createInputService(aasdk::messenger::IMessenge
     QRect videoGeometry;
     switch(configuration_->getVideoResolution())
     {
+    case aasdk::proto::enums::VideoResolution::_480p:
+        videoGeometry = QRect(0, 0, 800, 480);
+        break;
+
     case aasdk::proto::enums::VideoResolution::_720p:
         videoGeometry = QRect(0, 0, 1280, 720);
         break;
@@ -117,7 +122,34 @@ IService::Pointer ServiceFactory::createInputService(aasdk::messenger::IMessenge
         videoGeometry = QRect(0, 0, 1920, 1080);
         break;
 
+    case aasdk::proto::enums::VideoResolution::_1440p:
+        videoGeometry = QRect(0, 0, 2560, 1440);
+        break;
+
+    case aasdk::proto::enums::VideoResolution::_2160p:
+        videoGeometry = QRect(0, 0, 3840, 2160);
+        break;
+
+    case aasdk::proto::enums::VideoResolution::_720p_p:
+        videoGeometry = QRect(0, 0, 720, 1280);
+        break;
+
+    case aasdk::proto::enums::VideoResolution::_1080p_p:
+        videoGeometry = QRect(0, 0, 1080, 1920);
+        break;
+
+    case aasdk::proto::enums::VideoResolution::_1440p_p:
+        videoGeometry = QRect(0, 0, 1440, 2560);
+        break;
+
+    case aasdk::proto::enums::VideoResolution::_2160p_p:
+        videoGeometry = QRect(0, 0, 2160, 3840);
+        break;
+
     default:
+        OPENAUTO_LOG(warning) << "[ServiceFactory::createInputService] Unknown resolution enum "
+                              << configuration_->getVideoResolution()
+                              << ", assuming 480p (this is probably wrong).";
         videoGeometry = QRect(0, 0, 800, 480);
         break;
     }
