@@ -165,6 +165,43 @@ target_link_libraries(autoapp libusb
                         ${AASDK_PROTO_LIBRARIES}
                         ${AASDK_LIBRARIES})
 
+if(ANDROID)
+    # A hackish way to bundle all libraries needed into APK. The proper way is
+    # probably QT_ANDROID_EXTRA_LIBS, but that's Qt 6.
+    file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/copy_libs.cmake CONTENT "
+        # Pull in indirect Abseil dependencies.
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR PROTOBUF_LIBRARIES
+            UNRESOLVED_DEPENDENCIES_VAR PROTOBUF_LIBRARIES_SYSTEM_LIBS
+            LIBRARIES $<TARGET_LINKER_FILE:protobuf::libprotobuf>
+            DIRECTORIES $<TARGET_FILE_DIR:protobuf::libprotobuf>
+        )
+
+        set(LIBFILES
+            ${Boost_LIBRARIES}
+            ${LIBUSB_1_LIBRARIES}
+            $<TARGET_LINKER_FILE:protobuf::libprotobuf>
+            \${PROTOBUF_LIBRARIES}
+            ${RTAUDIO_LIBRARIES}
+            ${TAGLIB_LIBRARIES}
+            ${OPENSSL_LIBRARIES}
+            ${AASDK_PROTO_LIBRARIES}
+            ${AASDK_LIBRARIES}
+        )
+
+        # Filter out e.g. '-pthread'
+        list(FILTER LIBFILES INCLUDE REGEX \\\\.so)
+
+        file(COPY \${LIBFILES}
+            DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            FOLLOW_SYMLINK_CHAIN
+        )
+    ")
+
+    add_custom_command(TARGET autoapp POST_BUILD
+        COMMAND cmake -P ${CMAKE_CURRENT_BINARY_DIR}/copy_libs.cmake)
+endif()
+
 set(btservice_sources_directory ${sources_directory}/btservice)
 set(btservice_include_directory ${include_directory}/f1x/openauto/btservice)
 file(GLOB_RECURSE btservice_source_files ${btservice_sources_directory}/*.cpp ${btservice_include_directory}/*.hpp ${autoapp_sources_directory}/Configuration/*.cpp ${autoapp_includes_directory}/Configuration/*.hpp ${common_include_directory}/*.hpp)
