@@ -19,5 +19,15 @@
 #pragma once
 
 #include <boost/log/trivial.hpp>
+// TODO: bring back severity
+#include <QDebug>
+#include <string>
 
-#define OPENAUTO_LOG(severity) BOOST_LOG_TRIVIAL(severity) << "[OpenAuto] "
+#define OPENAUTO_LOG(severity) qDebug() << "[OpenAuto]"
+
+// https://stackoverflow.com/a/27360512
+static inline QDebug& operator<<(QDebug& out, const std::string& str)
+{
+    out << QString::fromStdString(str);
+    return out;
+}
