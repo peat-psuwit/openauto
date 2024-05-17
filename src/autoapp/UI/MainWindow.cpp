@@ -64,9 +64,12 @@ MainWindow::MainWindow(configuration::IConfiguration::Pointer configuration, QWi
     this->configuration_ = configuration;
 
     // trigger files
+    // TODO: allow all of these to use android properties
     this->nightModeEnabled = check_file_exist(this->nightModeFile);
-    this->devModeEnabled = check_file_exist(this->devModeFile);
-    this->wifiButtonForce = check_file_exist(this->wifiButtonFile);
+    // this->devModeEnabled = check_file_exist(this->devModeFile);
+    // this->wifiButtonForce = check_file_exist(this->wifiButtonFile);
+    this->devModeEnabled = true;
+    this->wifiButtonForce = true;
     this->cameraButtonForce = check_file_exist(this->cameraButtonFile);
     this->brightnessButtonForce = check_file_exist(this->brightnessButtonFile);
     this->systemDebugmode = check_file_exist(this->debugModeFile);
@@ -249,7 +252,7 @@ MainWindow::MainWindow(configuration::IConfiguration::Pointer configuration, QWi
         ui_->AAUSBWidget2->hide();
     }
 
-    if (std::ifstream("/tmp/temp_recent_list") || std::ifstream("/tmp/mobile_hotspot_detected")) {
+    if (/* std::ifstream("/tmp/temp_recent_list") || std::ifstream("/tmp/mobile_hotspot_detected")*/ true) {
         ui_->pushButtonWifi->show();
         ui_->pushButtonWifi->setFocus();
         ui_->pushButtonNoWiFiDevice->hide();
