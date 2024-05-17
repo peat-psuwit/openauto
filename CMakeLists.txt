@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(openauto CXX)
+project(openauto C CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -8,6 +8,12 @@ set(base_directory ${CMAKE_CURRENT_SOURCE_DIR})
 set(resources_directory ${base_directory}/assets)
 set(sources_directory ${base_directory}/src)
 set(include_directory ${base_directory}/include)
+
+if(ANDROID)
+    option(USE_GSTREAMER "Uses Gstreamer for video output" ON)
+else()
+    option(USE_GSTREAMER "Uses Gstreamer for video output" OFF)
+endif()
 
 # androiddeployqt expects library to be at a certain place
 if(NOT ANDROID)
@@ -64,6 +70,30 @@ if(RPI3_BUILD)
     set(ILCLIENT_LIBRARIES "/opt/vc/src/hello_pi/libs/ilclient/libilclient.a;/opt/vc/lib/libvcos.so;/opt/vc/lib/libvcilcs.a;/opt/vc/lib/libvchiq_arm.so")
 endif(RPI3_BUILD)
 
+if(USE_GSTREAMER)
+    add_definitions(-DUSE_GSTREAMER)
+
+    if(NOT ANDROID)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(Gst REQUIRED IMPORTED_TARGET
+            gstreamer-1.0 gstreamer-app-1.0)
+        set(gst_target PkgConfig::Gst)
+    else()
+        set(GSTREAMER_ANDROID_MODULE_NAME gstreamer_android)
+        set(GSTREAMER_EXTRA_DEPS gstreamer-app-1.0)
+        set(GSTREAMER_PLUGINS
+            coreelements playback videotestsrc audioconvert
+            videoconvertscale autodetect app isomp4
+            audioparsers typefindfunctions androidmedia
+            opengl videoparsersbad)
+        set(GSTREAMER_JAVA_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/java)
+        set(GSTREAMER_ASSETS_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets)
+
+        add_subdirectory(gstreamer_android)
+        set(gst_target ${GSTREAMER_ANDROID_MODULE_NAME})
+    endif()
+endif()
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${Qt5Core_PRIVATE_INCLUDE_DIRS}
                     ${Qt5Multimedia_INCLUDE_DIRS}
@@ -118,6 +148,7 @@ target_link_libraries(autoapp libusb
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
                         ${Qt5AndroidExtras_LIBRARIES}
+                        ${gst_target}
                         protobuf::libprotobuf
                         ${BCM_HOST_LIBRARIES}
                         ${ILCLIENT_LIBRARIES}
