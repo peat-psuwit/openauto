@@ -34,6 +34,12 @@ find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_
 find_package(libusb-1.0 REQUIRED)
 find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Network)
 
+if(ANDROID)
+    find_package(Qt5 REQUIRED COMPONENTS AndroidExtras)
+
+    set(ANDROID_PACKAGE_SOURCE_DIR ${base_directory}/android)
+endif()
+
 # Newer Protobuf starts requiring Abseil, and the old CMake's FindProtobuf
 # module is not updated to reflect that. Thus, prefer upstream's config module
 # if available.
@@ -59,11 +65,13 @@ if(RPI3_BUILD)
 endif(RPI3_BUILD)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
+                    ${Qt5Core_PRIVATE_INCLUDE_DIRS}
                     ${Qt5Multimedia_INCLUDE_DIRS}
                     ${Qt5MultimediaWidgets_INCLUDE_DIRS}
                     ${Qt5Widgets_INCLUDE_DIRS}
                     ${Qt5Bluetooth_INCLUDE_DIRS}
                     ${Qt5Network_INCLUDE_DIRS}
+                    ${Qt5AndroidExtras_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
                     ${OPENSSL_INCLUDE_DIR}
                     ${RTAUDIO_INCLUDE_DIRS}
@@ -79,9 +87,18 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 set(common_include_directory ${include_directory}/f1x/openauto/Common)
 
+set(aasdk_android_sources_directory ${sources_directory}/aasdk_android)
+set(aasdk_android_include_directory ${include_directory}/f1x/aasdk_android)
 set(autoapp_sources_directory ${sources_directory}/autoapp)
 set(autoapp_include_directory ${include_directory}/f1x/openauto/autoapp)
-file(GLOB_RECURSE autoapp_source_files ${autoapp_sources_directory}/*.ui ${autoapp_sources_directory}/*.cpp ${autoapp_include_directory}/*.hpp ${common_include_directory}/*.hpp ${resources_directory}/*.qrc)
+file(GLOB_RECURSE autoapp_source_files
+    ${aasdk_android_sources_directory}/*.cpp
+    ${aasdk_android_include_directory}/*.hpp
+    ${autoapp_sources_directory}/*.ui
+    ${autoapp_sources_directory}/*.cpp
+    ${autoapp_include_directory}/*.hpp
+    ${common_include_directory}/*.hpp
+    ${resources_directory}/*.qrc)
 
 if(ANDROID)
     # Android does not exec a new binary. Instead, the entry point
@@ -99,6 +116,7 @@ target_link_libraries(autoapp libusb
                         ${Qt5MultimediaWidgets_LIBRARIES}
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
+                        ${Qt5AndroidExtras_LIBRARIES}
                         protobuf::libprotobuf
                         ${BCM_HOST_LIBRARIES}
                         ${ILCLIENT_LIBRARIES}

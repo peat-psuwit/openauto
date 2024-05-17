@@ -25,6 +25,11 @@
 #include <aasdk/USB/AccessoryModeQueryChainFactory.hpp>
 #include <aasdk/USB/AccessoryModeQueryFactory.hpp>
 #include <aasdk/TCP/TCPWrapper.hpp>
+
+#ifdef __ANDROID__
+#include <f1x/aasdk_android/AndroidUSBHub.hpp>
+#endif
+
 #include <f1x/openauto/autoapp/App.hpp>
 #include <f1x/openauto/autoapp/Configuration/IConfiguration.hpp>
 #include <f1x/openauto/autoapp/Configuration/RecentAddressesList.hpp>
@@ -200,7 +205,11 @@ int main(int argc, char* argv[])
     autoapp::service::ServiceFactory serviceFactory(ioService, configuration);
     autoapp::service::AndroidAutoEntityFactory androidAutoEntityFactory(ioService, configuration, serviceFactory);
 
+    #ifdef __ANDROID__
+    auto usbHub(std::make_shared<aasdk::usb::AndroidUSBHub>(usbWrapper, ioService, queryChainFactory));
+    #else
     auto usbHub(std::make_shared<aasdk::usb::USBHub>(usbWrapper, ioService, queryChainFactory));
+    #endif
     auto connectedAccessoriesEnumerator(std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(usbWrapper, ioService, queryChainFactory));
     auto app = std::make_shared<autoapp::App>(ioService, usbWrapper, tcpWrapper, androidAutoEntityFactory, std::move(usbHub), std::move(connectedAccessoriesEnumerator));
 

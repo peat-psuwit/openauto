@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- TODO: do _some_ filtering. Idea includes getting VIDs & PIDs from ADB rules. -->
+    <usb-device />
+</resources>
