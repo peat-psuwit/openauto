@@ -1148,13 +1148,13 @@ void SettingsWindow::updateSystemInfo()
     QProcess process;
     process.start("/bin/bash", QStringList() << "-c" << "systemctl list-timers -all | grep disconnect | awk {'print $1'}");
     process.waitForFinished(-1);
-    QString stdout = process.readAllStandardOutput();
-    if (stdout.simplified() != "n/a") {
+    QString processOutput = process.readAllStandardOutput();
+    if (processOutput.simplified() != "n/a") {
         process.start("/bin/bash", QStringList() << "-c" << "systemctl list-timers -all | grep disconnect | awk {'print $5\" \"$6'}");
         process.waitForFinished(-1);
-        QString stdout = process.readAllStandardOutput();
-        if (stdout.simplified() != "") {
-            ui_->valueDisconnectTimer->setText(stdout.simplified());
+        QString processOutput = process.readAllStandardOutput();
+        if (processOutput.simplified() != "") {
+            ui_->valueDisconnectTimer->setText(processOutput.simplified());
         } else {
             ui_->valueDisconnectTimer->setText("Stopped");
         }
@@ -1163,13 +1163,13 @@ void SettingsWindow::updateSystemInfo()
     }
     process.start("/bin/bash", QStringList() << "-c" << "systemctl list-timers -all | grep shutdown | awk {'print $1'}");
     process.waitForFinished(-1);
-    stdout = process.readAllStandardOutput();
-    if (stdout.simplified() != "n/a") {
+    processOutput = process.readAllStandardOutput();
+    if (processOutput.simplified() != "n/a") {
         process.start("/bin/bash", QStringList() << "-c" << "systemctl list-timers -all | grep shutdown | awk {'print $5\" \"$6'}");
         process.waitForFinished(-1);
-        QString stdout = process.readAllStandardOutput();
-        if (stdout.simplified() != "") {
-            ui_->valueShutdownTimer->setText(stdout.simplified());
+        QString processOutput = process.readAllStandardOutput();
+        if (processOutput.simplified() != "") {
+            ui_->valueShutdownTimer->setText(processOutput.simplified());
         } else {
             ui_->valueShutdownTimer->setText("Stopped");
         }
