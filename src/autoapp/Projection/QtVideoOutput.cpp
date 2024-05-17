@@ -41,6 +41,38 @@ static void initGstOnce() {
     });
 }
 
+#include <QAndroidJniEnvironment>
+#include <QAndroidJniObject>
+#include <QtAndroid>
+
+/* https://stackoverflow.com/a/38846485/9161044 */
+// Dunno if worth implementing somewhere else or not.
+// FIXME: is this the right place?
+void keep_screen_on(bool on) {
+  QtAndroid::runOnAndroidThread([on]{
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    if (activity.isValid()) {
+      QAndroidJniObject window =
+          activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
+
+      if (window.isValid()) {
+        const int FLAG_KEEP_SCREEN_ON = 128;
+        if (on) {
+          window.callMethod<void>("addFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
+        } else {
+          window.callMethod<void>("clearFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
+        }
+      }
+    }
+    QAndroidJniEnvironment env;
+    if (env->ExceptionCheck()) {
+      env->ExceptionDescribe();
+      env->ExceptionClear();
+    }
+  });
+}
+#else
+void keep_screen_on(bool) {}
 #endif
 
 namespace f1x
@@ -81,12 +113,14 @@ bool QtVideoOutput::open()
 bool QtVideoOutput::init()
 {
     emit startPlayback();
+    keep_screen_on(true);
     return true;
 }
 
 void QtVideoOutput::stop()
 {
     emit stopPlayback();
+    keep_screen_on(false);
 }
 
 void QtVideoOutput::write(uint64_t, const aasdk::common::DataConstBuffer& buffer)
