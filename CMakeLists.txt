@@ -9,11 +9,11 @@ set(resources_directory ${base_directory}/assets)
 set(sources_directory ${base_directory}/src)
 set(include_directory ${base_directory}/include)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${base_directory}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${base_directory}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${base_directory}/bin)
-set(EXECUTABLE_OUTPUT_PATH ${base_directory}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
