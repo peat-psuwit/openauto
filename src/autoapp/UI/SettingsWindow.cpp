@@ -225,6 +225,14 @@ void SettingsWindow::onSave()
     {
         configuration_->setVideoResolution(aasdk::proto::enums::VideoResolution::_1080p);
     }
+    else if(ui_->radioButton720p_p->isChecked())
+    {
+        configuration_->setVideoResolution(aasdk::proto::enums::VideoResolution::_720p_p);
+    }
+    else if(ui_->radioButton1080p_p->isChecked())
+    {
+        configuration_->setVideoResolution(aasdk::proto::enums::VideoResolution::_1080p_p);
+    }
 
     configuration_->setScreenDPI(static_cast<size_t>(ui_->horizontalSliderScreenDPI->value()));
     configuration_->setOMXLayerIndex(ui_->spinBoxOmxLayerIndex->value());
@@ -505,9 +513,12 @@ void SettingsWindow::load()
     ui_->radioButton30FPS->setChecked(configuration_->getVideoFPS() == aasdk::proto::enums::VideoFPS::_30);
     ui_->radioButton60FPS->setChecked(configuration_->getVideoFPS() == aasdk::proto::enums::VideoFPS::_60);
 
+    // TODO: consider using dropdown list or something.
     ui_->radioButton480p->setChecked(configuration_->getVideoResolution() == aasdk::proto::enums::VideoResolution::_480p);
     ui_->radioButton720p->setChecked(configuration_->getVideoResolution() == aasdk::proto::enums::VideoResolution::_720p);
     ui_->radioButton1080p->setChecked(configuration_->getVideoResolution() == aasdk::proto::enums::VideoResolution::_1080p);
+    ui_->radioButton720p_p->setChecked(configuration_->getVideoResolution() == aasdk::proto::enums::VideoResolution::_720p_p);
+    ui_->radioButton1080p_p->setChecked(configuration_->getVideoResolution() == aasdk::proto::enums::VideoResolution::_1080p_p);
     ui_->horizontalSliderScreenDPI->setValue(static_cast<int>(configuration_->getScreenDPI()));
     ui_->spinBoxOmxLayerIndex->setValue(configuration_->getOMXLayerIndex());
 
