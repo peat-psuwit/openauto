@@ -38,8 +38,10 @@
 #include <QFileDialog>
 
 #include <qmediaplayer.h>
-#include <taglib/fileref.h>
-#include <taglib/tag.h>
+
+// taglib
+#include <fileref.h>
+#include <tag.h>
 
 #include <QFileSystemWatcher>
 #include <QKeyEvent>
