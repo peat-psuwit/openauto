@@ -145,7 +145,7 @@ endif()
 # linked whole-archive. Instead, to ensure consistent behavior,
 # Qt5MultimediaGstTools must be linked.
 # DO NOT upstream this feature.
-if (ANDROID AND DEFINED Qt5MultimediaGstTools_LIBRARIES)
+if (ANDROID AND Qt5MultimediaGstTools_LIBRARIES)
     # List comes from gsttools.pro
     set(gsttools_included_libs
         gstapp-1.0 gstreamer-1.0 gstaudio-1.0 gsttag-1.0 gstvideo-1.0 gstbase-1.0 gstpbutils-1.0
@@ -165,7 +165,7 @@ target_link_directories(${GSTREAMER_ANDROID_MODULE_NAME} PRIVATE
     ${gst_deps_LIBRARY_DIRS}
     ${gst_plugins_deps_LIBRARY_DIRS})
 
-if (ANDROID AND DEFINED Qt5MultimediaGstTools_LIBRARIES)
+if (ANDROID AND Qt5MultimediaGstTools_LIBRARIES)
     target_link_libraries(${GSTREAMER_ANDROID_MODULE_NAME} PUBLIC
         ${Qt5MultimediaGstTools_LIBRARIES})
 endif()
