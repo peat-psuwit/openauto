@@ -31,6 +31,7 @@
 #include <f1x/openauto/autoapp/Service/BluetoothService.hpp>
 #include <f1x/openauto/autoapp/Service/InputService.hpp>
 #include <f1x/openauto/autoapp/Projection/QtVideoOutput.hpp>
+#include <f1x/openauto/autoapp/Projection/QuickGstVideoOutput.hpp>
 #include <f1x/openauto/autoapp/Projection/OMXVideoOutput.hpp>
 #include <f1x/openauto/autoapp/Projection/RtAudioOutput.hpp>
 #include <f1x/openauto/autoapp/Projection/QtAudioOutput.hpp>
@@ -78,6 +79,8 @@ IService::Pointer ServiceFactory::createVideoService(aasdk::messenger::IMessenge
 {
 #ifdef USE_OMX
     auto videoOutput(std::make_shared<projection::OMXVideoOutput>(configuration_));
+#elif defined(USE_GSTREAMER)
+    projection::IVideoOutput::Pointer videoOutput(new projection::QuickGstVideoOutput(configuration_), std::bind(&QObject::deleteLater, std::placeholders::_1));
 #else
     projection::IVideoOutput::Pointer videoOutput(new projection::QtVideoOutput(configuration_), std::bind(&QObject::deleteLater, std::placeholders::_1));
 #endif

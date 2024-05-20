@@ -1,6 +1,7 @@
 /*
 *  This file is part of openauto project.
 *  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*  Copyright (C) 2024 Ratchanan Srirattanamet <peathot@hotmail.com>
 *
 *  openauto is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -18,13 +19,28 @@
 
 #pragma once
 
-#if ! defined(USE_GSTREAMER) && ! defined(USE_OMX)
+#ifdef USE_GSTREAMER
 
-#include <QMediaPlayer>
-#include <QVideoWidget>
+#include <memory>
+
+#include <QObject>
+#include <QQuickView>
+#include <QWidget>
+
+#include <gst/gstpipeline.h>
+#include <gst/app/gstappsrc.h>
+
 #include <boost/noncopyable.hpp>
+
 #include <f1x/openauto/autoapp/Projection/VideoOutput.hpp>
-#include <f1x/openauto/autoapp/Projection/SequentialBuffer.hpp>
+
+namespace {
+    struct GObjectDeleter {
+        void operator()(gpointer obj) {
+            g_object_unref(obj);
+        }
+    };
+}
 
 namespace f1x
 {
@@ -35,12 +51,13 @@ namespace autoapp
 namespace projection
 {
 
-class QtVideoOutput: public QObject, public VideoOutput, boost::noncopyable
+class QuickGstVideoOutput: public QObject, public VideoOutput, boost::noncopyable
 {
     Q_OBJECT
 
 public:
-    QtVideoOutput(configuration::IConfiguration::Pointer configuration);
+    QuickGstVideoOutput(configuration::IConfiguration::Pointer configuration);
+    ~QuickGstVideoOutput();
     bool open() override;
     bool init() override;
     void write(uint64_t timestamp, const aasdk::common::DataConstBuffer& buffer) override;
@@ -56,9 +73,20 @@ protected slots:
     void onStopPlayback();
 
 private:
-    SequentialBuffer videoBuffer_;
-    std::unique_ptr<QVideoWidget> videoWidget_;
-    std::unique_ptr<QMediaPlayer> mediaPlayer_;
+    static void onGstMessage(GstBus * bus, GstMessage * message, gpointer user_data);
+
+    std::unique_ptr<GstPipeline, GObjectDeleter> gstPipeline_;
+    std::unique_ptr<QWidget> widgetWrapper_;
+
+    std::unique_ptr<GstAppSrc, GObjectDeleter> appsrc_;
+    std::unique_ptr<GstElement, GObjectDeleter> qmlglsink_;
+
+    /* Owned by widgetWrapper_ */
+    QQuickView * quickView_;
+    /* Owned by quickView_ */
+    QQuickItem * videoItem_;
+
+    gulong onGstMessageHandlerId;
 };
 
 }

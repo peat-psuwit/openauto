@@ -126,6 +126,11 @@ if (DEFINED ENV{PKG_CONFIG_PATH})
 endif()
 set(ENV{PKG_CONFIG_PATH} "${gst_root}/lib/pkgconfig:${gst_static_plugins_path}/pkgconfig")
 
+if (GSTREAMER_PLUGIN_QT_ROOT_ANDROID)
+    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${GSTREAMER_PLUGIN_QT_ROOT_ANDROID}/${gst_arch}/lib/pkgconfig")
+endif()
+message("$ENV{PKG_CONFIG_PATH}")
+
 pkg_check_modules(gst_deps REQUIRED ${gst_deps})
 pkg_check_modules(gst_plugins_deps REQUIRED ${gst_plugins_deps})
 

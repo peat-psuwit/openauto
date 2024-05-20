@@ -38,7 +38,13 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Network)
+find_package(Qt5 COMPONENTS Widgets Multimedia Bluetooth Network)
+
+if(USE_GSTREAMER)
+    find_package(Qt5 REQUIRED COMPONENTS Quick Qml)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS MultimediaWidgets)
+endif()
 
 if(ANDROID)
     find_package(Qt5 REQUIRED COMPONENTS AndroidExtras)
@@ -84,11 +90,12 @@ if(USE_GSTREAMER)
     else()
         set(GSTREAMER_ANDROID_MODULE_NAME gstreamer_android)
         set(GSTREAMER_EXTRA_DEPS gstreamer-app-1.0)
+        set(GSTREAMER_EXTRA_LIBS Qt5::Gui Qt5::Quick Qt5::Qml)
         set(GSTREAMER_PLUGINS
             coreelements playback videotestsrc audioconvert
             videoconvertscale autodetect app isomp4
             audioparsers typefindfunctions androidmedia
-            opengl videoparsersbad)
+            opengl videoparsersbad qmlgl)
         set(GSTREAMER_JAVA_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/java)
         set(GSTREAMER_ASSETS_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets)
 
@@ -99,6 +106,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+                    ${Qt5Widgets_INCLUDE_DIRS}
                     ${Qt5Multimedia_INCLUDE_DIRS}
                     ${Qt5MultimediaWidgets_INCLUDE_DIRS}
                     ${Qt5Widgets_INCLUDE_DIRS}
@@ -106,6 +114,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${Qt5Network_INCLUDE_DIRS}
                     ${Qt5AndroidExtras_INCLUDE_DIRS}
                     ${Qt5MultimediaGstTools_INCLUDE_DIRS}
+                    ${Qt5Quick_INCLUDE_DIRS}
+                    ${Qt5Qml_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
                     ${OPENSSL_INCLUDE_DIR}
                     ${RTAUDIO_INCLUDE_DIRS}
@@ -131,6 +141,7 @@ file(GLOB_RECURSE autoapp_source_files
     ${aasdk_android_include_directory}/*.hpp
     ${autoapp_sources_directory}/*.ui
     ${autoapp_sources_directory}/*.cpp
+    ${autoapp_sources_directory}/*.qrc
     ${autoapp_include_directory}/*.hpp
     ${common_include_directory}/*.hpp
     ${resources_directory}/*.qrc)
@@ -147,12 +158,15 @@ endif()
 
 target_link_libraries(autoapp libusb
                         ${Boost_LIBRARIES}
+                        ${Qt5Widgets_LIBRARIES}
                         ${Qt5Multimedia_LIBRARIES}
                         ${Qt5MultimediaWidgets_LIBRARIES}
                         ${Qt5Bluetooth_LIBRARIES}
                         ${Qt5Network_LIBRARIES}
                         ${Qt5AndroidExtras_LIBRARIES}
                         ${Qt5MultimediaGstTools_LIBRARIES}
+                        ${Qt5Quick_LIBRARIES}
+                        ${Qt5Qml_LIBRARIES}
                         ${gst_target}
                         protobuf::libprotobuf
                         ${BCM_HOST_LIBRARIES}

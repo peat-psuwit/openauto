@@ -16,6 +16,8 @@
 *  along with openauto. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if ! defined(USE_GSTREAMER) && ! defined(USE_OMX)
+
 #include <QApplication>
 #include <f1x/openauto/autoapp/Projection/QtVideoOutput.hpp>
 #include <f1x/openauto/Common/Log.hpp>
@@ -152,3 +154,5 @@ void QtVideoOutput::onStopPlayback()
 }
 }
 }
+
+#endif
