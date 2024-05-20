@@ -15,8 +15,11 @@ else()
     option(USE_GSTREAMER "Uses Gstreamer for video output" OFF)
 endif()
 
-# androiddeployqt expects library to be at a certain place
-if(NOT ANDROID)
+if(ANDROID)
+    set(ANDROID_PACKAGE_SOURCE_DIR ${base_directory}/android)
+else()
+    # androiddeployqt expects library to be at a certain place, thus cannot
+    # have these variables set.
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
@@ -48,8 +51,6 @@ endif()
 
 if(ANDROID)
     find_package(Qt5 REQUIRED COMPONENTS AndroidExtras)
-
-    set(ANDROID_PACKAGE_SOURCE_DIR ${base_directory}/android)
 
     # TODO: will go away when we migrate to qmlglsink
     find_package(Qt5 REQUIRED COMPONENTS MultimediaGstTools)
