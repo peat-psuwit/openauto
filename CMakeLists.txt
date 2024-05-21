@@ -90,13 +90,14 @@ if(USE_GSTREAMER)
         set(gst_target PkgConfig::Gst)
     else()
         set(GSTREAMER_ANDROID_MODULE_NAME gstreamer_android)
-        set(GSTREAMER_EXTRA_DEPS gstreamer-app-1.0)
+        set(GSTREAMER_EXTRA_DEPS gstreamer-app-1.0 gstreamer-audio-1.0)
         set(GSTREAMER_EXTRA_LIBS Qt5::Gui Qt5::Quick Qt5::Qml)
         set(GSTREAMER_PLUGINS
             coreelements playback videotestsrc audioconvert
             videoconvertscale autodetect app isomp4
             audioparsers typefindfunctions androidmedia
-            opengl videoparsersbad qmlgl)
+            opengl videoparsersbad qmlgl
+            audioconvert audioresample opensles)
         set(GSTREAMER_JAVA_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/java)
         set(GSTREAMER_ASSETS_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets)
 

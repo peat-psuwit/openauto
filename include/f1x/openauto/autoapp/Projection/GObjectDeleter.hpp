@@ -1,6 +1,6 @@
 /*
 *  This file is part of openauto project.
-*  Copyright (C) 2018 f1x.studio (Michal Szwaj)
+*  Copyright (C) 2024 Ratchanan Srirattanamet <peathot@hotmail.com>
 *
 *  openauto is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -18,23 +18,28 @@
 
 #pragma once
 
+#ifdef USE_GSTREAMER
+
+#include <glib-object.h>
+
 namespace f1x
 {
 namespace openauto
 {
 namespace autoapp
 {
-namespace configuration
+namespace projection
 {
 
-enum class AudioOutputBackendType
-{
-    RTAUDIO,
-    QT,
-    GSTREAMER,
+struct GObjectDeleter {
+    void operator()(gpointer obj) {
+        g_object_unref(obj);
+    }
 };
 
 }
 }
 }
 }
+
+#endif

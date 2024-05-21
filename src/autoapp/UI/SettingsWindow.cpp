@@ -262,7 +262,10 @@ void SettingsWindow::onSave()
 
     configuration_->setMusicAudioChannelEnabled(ui_->checkBoxMusicAudioChannel->isChecked());
     configuration_->setSpeechAudioChannelEnabled(ui_->checkBoxSpeechAudioChannel->isChecked());
-    configuration_->setAudioOutputBackendType(ui_->radioButtonRtAudio->isChecked() ? configuration::AudioOutputBackendType::RTAUDIO : configuration::AudioOutputBackendType::QT);
+    configuration_->setAudioOutputBackendType(
+          ui_->radioButtonRtAudio->isChecked() ? configuration::AudioOutputBackendType::RTAUDIO
+        : ui_->radioButtonQtAudio->isChecked() ? configuration::AudioOutputBackendType::QT
+        : configuration::AudioOutputBackendType::GSTREAMER);
 
     configuration_->save();
 
@@ -542,6 +545,10 @@ void SettingsWindow::load()
     const auto& audioOutputBackendType = configuration_->getAudioOutputBackendType();
     ui_->radioButtonRtAudio->setChecked(audioOutputBackendType == configuration::AudioOutputBackendType::RTAUDIO);
     ui_->radioButtonQtAudio->setChecked(audioOutputBackendType == configuration::AudioOutputBackendType::QT);
+    ui_->radioButtonGstAudio->setChecked(audioOutputBackendType == configuration::AudioOutputBackendType::GSTREAMER);
+#ifndef USE_GSTREAMER
+    ui_->radioButtonGstAudio->setDisabled(true);
+#endif
 
     ui_->checkBoxHardwareSave->setChecked(false);
     QStorageInfo storage("/media/USBDRIVES/CSSTORAGE");

@@ -21,19 +21,12 @@
 
 #ifdef USE_GSTREAMER
 
-#include <memory>
-
-#include <QObject>
-#include <QQuickView>
-#include <QWidget>
-
-#include <gst/gstpipeline.h>
+#include <gst/gst.h>
+#include <gst/audio/audio-info.h>
 #include <gst/app/gstappsrc.h>
 
-#include <boost/noncopyable.hpp>
-
 #include <f1x/openauto/autoapp/Projection/GObjectDeleter.hpp>
-#include <f1x/openauto/autoapp/Projection/VideoOutput.hpp>
+#include <f1x/openauto/autoapp/Projection/IAudioOutput.hpp>
 
 namespace f1x
 {
@@ -44,42 +37,24 @@ namespace autoapp
 namespace projection
 {
 
-class QuickGstVideoOutput: public QObject, public VideoOutput, boost::noncopyable
+class GstAudioOutput: public IAudioOutput
 {
-    Q_OBJECT
 
 public:
-    QuickGstVideoOutput(configuration::IConfiguration::Pointer configuration);
-    ~QuickGstVideoOutput();
+    GstAudioOutput(uint32_t channelCount, uint32_t sampleSize, uint32_t sampleRate);
     bool open() override;
-    bool init() override;
-    void write(uint64_t timestamp, const aasdk::common::DataConstBuffer& buffer) override;
+    void write(aasdk::messenger::Timestamp::ValueType, const aasdk::common::DataConstBuffer& buffer) override;
+    void start() override;
     void stop() override;
-
-signals:
-    void startPlayback();
-    void stopPlayback();
-
-protected slots:
-    void createVideoOutput();
-    void onStartPlayback();
-    void onStopPlayback();
+    void suspend() override;
+    uint32_t getSampleSize() const override;
+    uint32_t getChannelCount() const override;
+    uint32_t getSampleRate() const override;
 
 private:
-    static void onGstMessage(GstBus * bus, GstMessage * message, gpointer user_data);
-
+    GstAudioInfo audioInfo_;
     std::unique_ptr<GstPipeline, GObjectDeleter> gstPipeline_;
-    std::unique_ptr<QWidget> widgetWrapper_;
-
     std::unique_ptr<GstAppSrc, GObjectDeleter> appsrc_;
-    std::unique_ptr<GstElement, GObjectDeleter> qmlglsink_;
-
-    /* Owned by widgetWrapper_ */
-    QQuickView * quickView_;
-    /* Owned by quickView_ */
-    QQuickItem * videoItem_;
-
-    gulong onGstMessageHandlerId;
 };
 
 }
