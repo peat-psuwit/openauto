@@ -93,11 +93,8 @@ if(USE_GSTREAMER)
         set(GSTREAMER_EXTRA_DEPS gstreamer-app-1.0 gstreamer-audio-1.0)
         set(GSTREAMER_EXTRA_LIBS Qt5::Gui Qt5::Quick Qt5::Qml)
         set(GSTREAMER_PLUGINS
-            coreelements playback videotestsrc audioconvert
-            videoconvertscale autodetect app isomp4
-            audioparsers typefindfunctions androidmedia
-            opengl videoparsersbad qmlgl
-            audioconvert audioresample opensles)
+            coreelements playback autodetect app typefindfunctions androidmedia
+            opengl videoparsersbad qmlgl audioconvert audioresample opensles)
         set(GSTREAMER_JAVA_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/java)
         set(GSTREAMER_ASSETS_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets)
 
